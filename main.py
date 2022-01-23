@@ -88,17 +88,16 @@ def index():
             write_json(list)
 
         elif text == 'favoritelist':
-            movie_names = read_json()
-
-            if movie_names:
+            try:
+                movie_names = read_json()
                 sendmessage(chat_id, f'Your fave list \n {movie_names}')
 
-            else:
+            except:
                 sendmessage(chat_id, 'you have added nothing yet!')
 
         return Response('ok', status=200)
     else:
-        return ''
+        return '<h1>GET request</h1>'
 
 
 def write_json(data, filename='favoritelist.json'):
