@@ -4,7 +4,8 @@ from flask import Flask
 import json
 import requests
 import os
-url = "https://api.telegram.org/bot5164303840:AAFinWpqK_Nk3_6ZJscImsaL31zoCE0dsyo/"
+# 5179449404:AAGf_qT06F42PODMusM1_iQaY4DPqcQ-Wqc
+url = "https://api.telegram.org/bot5179449404:AAGf_qT06F42PODMusM1_iQaY4DPqcQ-Wqc/"
 
 app = Flask(__name__)
 
