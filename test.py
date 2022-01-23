@@ -46,7 +46,7 @@ def index():
             sendmessage(chat_id, 'Name Film Ra Vared Konid')
         return Response('ok', status=200)
     else:
-        return ''
+        return '<h1>Film Bot</h1>'
 
 
-app.run('0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+app.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
