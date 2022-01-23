@@ -1,3 +1,4 @@
+from asyncore import read
 from flask import Response
 from flask import request
 from flask import Flask
@@ -9,7 +10,8 @@ from bs4 import BeautifulSoup
 import requests
 
 # esmfilm = input()
-page = requests.get('https://www.imdb.com/search/title/?groups=top_1000&sort=user_rating,desc&count=200&ref_=adv_prv')
+page = requests.get(
+    'https://www.imdb.com/search/title/?groups=top_1000&sort=user_rating,desc&count=200&ref_=adv_prv')
 moviename = []
 imdbrate = []
 genere = []
@@ -18,22 +20,24 @@ ratedict = {}
 genredict = {}
 
 
-soup = BeautifulSoup(page.content,'html.parser')
+soup = BeautifulSoup(page.content, 'html.parser')
 
-data = soup.find_all('div',class_='lister-item mode-advanced')
+data = soup.find_all('div', class_='lister-item mode-advanced')
 
 for i in data:
     name = i.h3.a.text
     moviename.append(name)
 
-    rate = i.find('div',class_='inline-block ratings-imdb-rating').text.replace('\n','')
+    rate = i.find(
+        'div', class_='inline-block ratings-imdb-rating').text.replace('\n', '')
     imdbrate.append(rate)
-    ratedict.update({name:rate})
-    moviegenre = i.p.find('span',class_='genre').text.replace('\n','').replace(' ','')
+    ratedict.update({name: rate})
+    moviegenre = i.p.find('span', class_='genre').text.replace(
+        '\n', '').replace(' ', '')
     genere.append(moviegenre)
-    genredict.update({name:moviegenre})
-    year = i.h3.find('span',class_='lister-item-year text-muted unbold').text
-    movieyeardict.update({name:year})
+    genredict.update({name: moviegenre})
+    year = i.h3.find('span', class_='lister-item-year text-muted unbold').text
+    movieyeardict.update({name: year})
 
 
 # print(movieyeardict.get(esmfilm),ratedict.get(esmfilm),genredict.get(esmfilm),sep=' | ')
@@ -71,9 +75,9 @@ def index():
             sendmessage(chat_id, 'Name Film Ra Vared Konid')
         elif 'search' in text:
             esmfilm = text.split(maxsplit=1)[1]
-            sendmessage(chat_id,(movieyeardict.get(esmfilm)))
-            sendmessage(chat_id,(ratedict.get(esmfilm)))
-            sendmessage(chat_id,(genredict.get(esmfilm)))
+            sendmessage(chat_id, (movieyeardict.get(esmfilm)))
+            sendmessage(chat_id, (ratedict.get(esmfilm)))
+            sendmessage(chat_id, (genredict.get(esmfilm)))
         elif 'add' in text:
             list = read_json()
             username = msg['message']['from']['username']
@@ -82,8 +86,16 @@ def index():
             esmfilm = text.split[1]
             list[username].append(esmfilm)
             write_json(list)
+
         elif text == 'favoritelist':
-            pass
+            movie_names = read_json()
+
+            if movie_names:
+                sendmessage(chat_id, f'Your fave list \n {movie_names}')
+
+            else:
+                sendmessage(chat_id, 'you have added nothing yet!')
+
         return Response('ok', status=200)
     else:
         return ''
@@ -100,7 +112,5 @@ def read_json(filename='favoritelist.json'):
     return data
 
 
-#app.run(debug=True)
+# app.run(debug=True)
 app.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
-
-
