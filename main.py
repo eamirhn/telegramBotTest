@@ -1,4 +1,3 @@
-from asyncore import read
 from flask import Response
 from flask import request
 from flask import Flask
@@ -18,6 +17,7 @@ genere = []
 movieyeardict = {}
 ratedict = {}
 genredict = {}
+sumarrydict = {}
 
 
 soup = BeautifulSoup(page.content, 'html.parser')
@@ -38,7 +38,9 @@ for i in data:
     genredict.update({name: moviegenre})
     year = i.h3.find('span', class_='lister-item-year text-muted unbold').text
     movieyeardict.update({name: year})
-
+    summary = i.find_all('p', class_='text-muted')
+    Summ = summary[1].text
+    sumarrydict.update({name: Summ})
 
 # print(movieyeardict.get(esmfilm),ratedict.get(esmfilm),genredict.get(esmfilm),sep=' | ')
 
@@ -72,32 +74,40 @@ def index():
         chat_id = get_chat_id(msg)
         text = msg['message'].get('text', '')
         if text == '/start':
-            sendmessage(chat_id, 'Name Film Ra Vared Konid')
+            sendmessage(chat_id, 'Enter Movie Name')
         elif 'search' in text:
             esmfilm = text.split(maxsplit=1)[1]
             sendmessage(chat_id, (movieyeardict.get(esmfilm)))
             sendmessage(chat_id, (ratedict.get(esmfilm)))
             sendmessage(chat_id, (genredict.get(esmfilm)))
+
+        elif 'summary' in text:
+            esmfilm = text.split(maxsplit=1)[1]
+            sendmessage(chat_id, (sumarrydict.get(esmfilm)))
         elif 'add' in text:
+
+            esmfilm = text.split(maxsplit=1)[1]
+            list = read_json()
+            username = msg['message']['from']['username']
+            sendmessage(chat_id, 'Added Successfully')
+            if username not in list.keys():
+                list[username] = []
+            list[username].append(esmfilm)
+            write_json(list)
+        elif text == 'favoritelist':
             list = read_json()
             username = msg['message']['from']['username']
             if username not in list.keys():
-                list[username] = []
-            esmfilm = text.split[1]
-            list[username].append(esmfilm)
-            write_json(list)
+                sendmessage(chat_id, 'Favorite List is Empty')
+            else:
+                for j in list[username]:
+                    sendmessage(chat_id, j)
 
-        elif text == 'favoritelist':
-            try:
-                movie_names = read_json()
-                sendmessage(chat_id, f'Your fave list \n {movie_names}')
-
-            except:
-                sendmessage(chat_id, 'you have added nothing yet!')
-
+        else:
+            sendmessage(chat_id, 'INVALID REQUEST')
         return Response('ok', status=200)
     else:
-        return '<h1>GET request</h1>'
+        return ''
 
 
 def write_json(data, filename='favoritelist.json'):
@@ -111,5 +121,6 @@ def read_json(filename='favoritelist.json'):
     return data
 
 
+write_json({})
 # app.run(debug=True)
 app.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
